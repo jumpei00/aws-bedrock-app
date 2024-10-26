@@ -30,7 +30,7 @@ Resources:
     Type: "AWS::Lambda::Function"
     Properties:
       Architectures:
-        - "x86_64"
+        - "arm64"
       Code:
         ZipFile: |
           package main
@@ -49,7 +49,7 @@ Resources:
           }
       Description: "get conversation Lambda function with DynamoDB get access."
       FunctionName: "get_conversation"
-      Handler: "main"
+      Handler: "bootstrap"
       MemorySize: 128
       PackageType: "Zip"
       Role: !GetAtt LambdaDynamoGetRole.Arn
