@@ -4,7 +4,7 @@ Resources:
   LamdaCodeBucket:
     Type: AWS::S3::Bucket
     Properties:
-      Bucket: "lambda-code-bucket"
+      Bucket: "bedrock-app-lambda-code-bucket"
       VersioningConfiguration:
         Status: "Enabled"
       LifecycleConfiguration:
