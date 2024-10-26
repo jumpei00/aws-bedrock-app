@@ -52,6 +52,6 @@ Resources:
       Handler: "main"
       MemorySize: 128
       PackageType: "Zip"
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: !GetAtt LambdaDynamoGetRole.Arn
       Runtime: "provided.al2023"
       Timeout: 3
