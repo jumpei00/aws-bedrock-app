@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Lambda function with DynamoDB get access.'
+Resources:
+  LambdaDynamoGetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:Scan'
+                Resource: '*'
+  LambdaDynamoGetFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Architectures:
+        - 'x86_64'
+      Code:
+        ZipFile: |
+          package main
+          
+          import (
+              "context"
+              "github.com/aws/aws-lambda-go/lambda"
+          )
+          
+          func handler(ctx context.Context) error {
+              return nil
+          }
+          
+          func main() {
+              lambda.Start(handler)
+          }
+      Description: 'Lambda function with DynamoDB get access.'
+      FunctionName: 'get_conversation'
+      Handler: 'main'
+      MemorySize: 128
+      PackageType: 'Zip'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: 'provided.al2023'
+      Timeout: 3
