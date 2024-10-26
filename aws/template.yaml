@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Lambda function with DynamoDB get access."
+Description: "Bedrock application infra template"
 Resources:
   LambdaDynamoGetRole:
     Type: "AWS::IAM::Role"
@@ -47,7 +47,7 @@ Resources:
           func main() {
               lambda.Start(handler)
           }
-      Description: "Lambda function with DynamoDB get access."
+      Description: "get conversation Lambda function with DynamoDB get access."
       FunctionName: "get_conversation"
       Handler: "main"
       MemorySize: 128
