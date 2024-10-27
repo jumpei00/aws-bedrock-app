@@ -56,3 +56,45 @@ Resources:
       Role: !GetAtt LambdaDynamoGetRole.Arn
       Runtime: "provided.al2023"
       Timeout: 3
+  LambdaDynamoPOSTRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:PutItem"
+                Resource: "*"
+  LambdaDynamoPOSTFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - "LamdaCodeBucket"
+      - "LambdaDynamoPOSTRole"
+    Properties:
+      Architectures:
+        - "arm64"
+      Code:
+        S3Bucket: !Ref LamdaCodeBucket
+        S3Key: "post_conversation.zip"
+      Description: "post conversation Lambda function with DynamoDB post access."
+      FunctionName: "post_conversation"
+      Handler: "bootstrap"
+      MemorySize: 128
+      PackageType: "Zip"
+      Role: !GetAtt LambdaDynamoPOSTRole.Arn
+      Runtime: "provided.al2023"
+      Timeout: 3
