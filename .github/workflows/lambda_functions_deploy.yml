@@ -1,0 +1,78 @@
+name: Lambda Functions Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-northeast-1
+  S3_BUCKET: bedrock-app-lambda-code-bucket
+  GET_CONVERSATION_DIRECTORY: lambda/cmd/get_conversation
+  GET_CONVERSATION_S3_KEY: get_conversation.zip
+  GET_CONVERSATION_LAMBDA_FUNCTION: get_conversation
+  POST_CONVERSATION_DIRECTORY: lambda/cmd/post_conversation
+  POST_CONVERSATION_S3_KEY: post_conversation.zip
+  POST_CONVERSATION_LAMBDA_FUNCTION: post_conversation
+
+jobs:
+  get_conversation_lambda_deploy:
+    environment: deploy_lambda
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Go build
+        run: |
+          cd ${{ env.GET_CONVERSATION_DIRECTORY }}
+          GOOS=linux GOARCH=arm64 go build -o bootstrap main.go
+          chmod +x bootstrap
+          zip ${{ env.GET_CONVERSATION_S3_KEY }} bootstrap
+      - name: Upload to S3
+        run: |
+          aws s3 cp ${{ env.GET_CONVERSATION_DIRECTORY }}/${{ env.GET_CONVERSATION_S3_KEY }} s3://${{ env.S3_BUCKET }}/${{ env.GET_CONVERSATION_S3_KEY }}
+      - name: Deploy lambda
+        run: |
+          aws lambda update-function-code --function-name ${{ env.GET_CONVERSATION_LAMBDA_FUNCTION }} --s3-bucket ${{ env.S3_BUCKET }} --s3-key ${{ env.GET_CONVERSATION_S3_KEY }}
+  post_conversation_lamda_deploy:
+    environment: deploy_lambda
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Go build
+        run: |
+          cd ${{ env.POST_CONVERSATION_DIRECTORY }}
+          GOOS=linux GOARCH=arm64 go build -o bootstrap main.go
+          chmod +x bootstrap
+          zip ${{ env.POST_CONVERSATION_S3_KEY }} bootstrap
+      - name: Upload to S3
+        run: |
+          aws s3 cp ${{ env.POST_CONVERSATION_DIRECTORY }}/${{ env.POST_CONVERSATION_S3_KEY }} s3://${{ env.S3_BUCKET }}/${{ env.POST_CONVERSATION_S3_KEY }}
+      # - name: Deploy lambda
+      #   run: |
+      #     aws lambda update-function-code --function-name ${{ env.POST_CONVERSATION_LAMBDA_FUNCTION }} --s3-bucket ${{ env.S3_BUCKET }} --s3-key ${{ env.POST_CONVERSATION_S3_KEY }}
