@@ -37,22 +37,22 @@ Resources:
                   - "dynamodb:Query"
                   - "dynamodb:Scan"
                 Resource: "*"
-  # LambdaDynamoGetFunction:
-  #   Type: AWS::Lambda::Function
-  #   DependsOn:
-  #     - "LamdaCodeBucket"
-  #     - "LambdaDynamoGetRole"
-  #   Properties:
-  #     Architectures:
-  #       - "arm64"
-  #     Code:
-  #       S3Bucket: !Ref LamdaCodeBucket
-  #       S3Key: "get_conversation.zip"
-  #     Description: "get conversation Lambda function with DynamoDB get access."
-  #     FunctionName: "get_conversation"
-  #     Handler: "bootstrap"
-  #     MemorySize: 128
-  #     PackageType: "Zip"
-  #     Role: !GetAtt LambdaDynamoGetRole.Arn
-  #     Runtime: "provided.al2023"
-  #     Timeout: 3
+  LambdaDynamoGetFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - "LamdaCodeBucket"
+      - "LambdaDynamoGetRole"
+    Properties:
+      Architectures:
+        - "arm64"
+      Code:
+        S3Bucket: !Ref LamdaCodeBucket
+        S3Key: "get_conversation.zip"
+      Description: "get conversation Lambda function with DynamoDB get access."
+      FunctionName: "get_conversation"
+      Handler: "bootstrap"
+      MemorySize: 128
+      PackageType: "Zip"
+      Role: !GetAtt LambdaDynamoGetRole.Arn
+      Runtime: "provided.al2023"
+      Timeout: 3
