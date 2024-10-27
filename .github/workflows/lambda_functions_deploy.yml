@@ -73,6 +73,6 @@ jobs:
       - name: Upload to S3
         run: |
           aws s3 cp ${{ env.POST_CONVERSATION_DIRECTORY }}/${{ env.POST_CONVERSATION_S3_KEY }} s3://${{ env.S3_BUCKET }}/${{ env.POST_CONVERSATION_S3_KEY }}
-      # - name: Deploy lambda
-      #   run: |
-      #     aws lambda update-function-code --function-name ${{ env.POST_CONVERSATION_LAMBDA_FUNCTION }} --s3-bucket ${{ env.S3_BUCKET }} --s3-key ${{ env.POST_CONVERSATION_S3_KEY }}
+      - name: Deploy lambda
+        run: |
+          aws lambda update-function-code --function-name ${{ env.POST_CONVERSATION_LAMBDA_FUNCTION }} --s3-bucket ${{ env.S3_BUCKET }} --s3-key ${{ env.POST_CONVERSATION_S3_KEY }}
