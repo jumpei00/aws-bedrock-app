@@ -12,8 +12,34 @@ Resources:
           - Id: DeleteOldObjects
             Status: "Enabled"
             NoncurrentVersionExpirationInDays: 90
+  ConversationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "conversations"
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: sessionKey
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: SessionIndex
+          KeySchema:
+            - AttributeName: sessionKey
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
   LambdaDynamoGetRole:
     Type: AWS::IAM::Role
+    DependsOn:
+      - "ConversationsTable"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -36,7 +62,9 @@ Resources:
                   - "dynamodb:GetItem"
                   - "dynamodb:Query"
                   - "dynamodb:Scan"
-                Resource: "*"
+                Resource:
+                  - !GetAtt ConversationsTable.Arn
+                  - !Sub "${ConversationsTable.Arn}/index/*"
   LambdaDynamoGetFunction:
     Type: AWS::Lambda::Function
     DependsOn:
@@ -58,6 +86,8 @@ Resources:
       Timeout: 3
   LambdaDynamoPOSTRole:
     Type: AWS::IAM::Role
+    DependsOn:
+      - "ConversationsTable"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -78,7 +108,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - "dynamodb:PutItem"
-                Resource: "*"
+                Resource:
+                  - !GetAtt ConversationsTable.Arn
   LambdaDynamoPOSTFunction:
     Type: AWS::Lambda::Function
     DependsOn:
