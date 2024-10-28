@@ -7,13 +7,13 @@ type PromptFlowEvent struct {
 }
 
 type PromptFlow struct {
-	FlowArn      string `json:"flowArn"`
-	FlowAliasArn string `json:"flowAliasArn"`
+	Arn      string `json:"arn"`
+	AliasArn string `json:"aliasId"`
 }
 
 type PromptFlowNode struct {
 	Name       string                `json:"name"`
-	NodeInputs []PromptFlowNodeInput `json:"nodeInputs"`
+	NodeInputs []PromptFlowNodeInput `json:"inputs"`
 }
 
 type PromptFlowNodeInput struct {
