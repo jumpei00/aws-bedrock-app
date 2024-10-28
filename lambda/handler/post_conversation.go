@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -24,6 +25,7 @@ func NewPostConversationHandler(tableName string) (*PostConversationHandler, err
 }
 
 func (h *PostConversationHandler) Handle(ctx context.Context, req common.PromptFlowEvent) error {
+	fmt.Printf("req: %+v\n", req)
 	// 1番目のnodeInputsにsessionKeyが存在する前提
 	// 2番目のnodeInputsにuserMessageが存在する前提
 	// 3番目のnodeInputsにaiResponseが存在する前提
