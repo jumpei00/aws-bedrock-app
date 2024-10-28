@@ -11,10 +11,6 @@ import (
 	"github.com/jumpei00/aws-bedrock-app/lambda/models"
 )
 
-type GetConversationRequest struct {
-	SessionKey string `json:"session_key"`
-}
-
 type GetConversationHandler struct {
 	dynamoHandler *common.DynamoHandler
 }
@@ -27,8 +23,11 @@ func NewGetConversationHandler(tableName string) (*GetConversationHandler, error
 	return &GetConversationHandler{dynamoHandler: dynamoHandler}, nil
 }
 
-func (h *GetConversationHandler) Handle(ctx context.Context, req GetConversationRequest) ([]models.Conversation, error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(expression.Key("sessionKey").Equal(expression.Value(req.SessionKey))).Build()
+func (h *GetConversationHandler) Handle(ctx context.Context, req common.PromptFlowEvent) ([]models.Conversation, error) {
+	// 1番目のnodeInputsにsessionKeyが存在する前提
+	sessionKey := req.Node.NodeInputs[0].Value
+
+	expr, err := expression.NewBuilder().WithKeyCondition(expression.Key("sessionKey").Equal(expression.Value(sessionKey))).Build()
 	if err != nil {
 		return nil, err
 	}

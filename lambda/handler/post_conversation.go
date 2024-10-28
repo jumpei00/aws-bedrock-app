@@ -11,12 +11,6 @@ import (
 	"github.com/jumpei00/aws-bedrock-app/lambda/models"
 )
 
-type PostConversationRequest struct {
-	SessionKey  string `json:"session_key"`
-	UserMessage string `json:"user_message"`
-	AIResponse  string `json:"ai_response"`
-}
-
 type PostConversationHandler struct {
 	dynamoHandler *common.DynamoHandler
 }
@@ -29,12 +23,17 @@ func NewPostConversationHandler(tableName string) (*PostConversationHandler, err
 	return &PostConversationHandler{dynamoHandler: dynamoHandler}, nil
 }
 
-func (h *PostConversationHandler) Handle(ctx context.Context, req PostConversationRequest) error {
+func (h *PostConversationHandler) Handle(ctx context.Context, req common.PromptFlowEvent) error {
+	// 1番目のnodeInputsにsessionKeyが存在する前提
+	// 2番目のnodeInputsにuserMessageが存在する前提
+	// 3番目のnodeInputsにaiResponseが存在する前提
+
+	nodeInputs := req.Node.NodeInputs
 	conversation := models.Conversation{
 		ID:          uuid.New().String(),
-		SessionKey:  req.SessionKey,
-		UserMessage: req.UserMessage,
-		AIResponse:  req.AIResponse,
+		SessionKey:  nodeInputs[0].Value,
+		UserMessage: nodeInputs[1].Value,
+		AIResponse:  nodeInputs[2].Value,
 		CreatedAt:   time.Now().UTC().Format(time.RFC3339),
 	}
 
